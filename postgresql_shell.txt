@@ -1,0 +1,127 @@
+psql --postgresql database'in shell'ini verir. Varsayılan database'e bağlanır ve shell alır.
+\l --database listesini verir.
+\? --yardım menüsü.
+\q --psql'den çıkar.
+drop database deneme --deneme isimli database'i siler.
+\c postgres --postgres kullanıcısı ile connect(bağlanma) olur.
+pssql -d deneme1 --deneme1 isimli database'e bağlanır ve shell alır.
+psql  --help --psql hakkında yardım menüsü.
+create database husocode;
+\! clear --ekranı temizler.
+\! cls --ekranı temizler(Windows)
+\d --ilişkili olan tabloların detaylarını verir.
+\dt --ilişkili olan tabloların detaylarını sequence'ler olmadan verir.
+\d accounts --accounts isimli tablonun detaylarını verir. d desciription demek.
+
+SELECT TABLENAME, INDEXNAME, INDEXDEF
+FROM PG_INDEXES
+WHERE SCHEMANAME = 'public';
+
+\x --genişletilmiş ekran console çıktısı verir. daha temiz.
+\x --tekrar yazılırsa genişletilmiş görünüm kapatılır.
+
+$> \timing --zamanlamayı acar/kapar. Sorgu çalışması kaç saniye/milisaniye sürdüğünü hesaplamak içindir.
+
+\df --fonksiyonların açıklamasını verir. d description f ise function demektir.
+
+DROP FUNCTION FUNCTION_NAME; //fonksiyonu drop eder siler.
+
+\du postgres --postgres isimli database'in role attribute'lerini verir. Hangi kullanıcı hangi yetkilere ve rollere sahip onu verir.
+
+SELECT ROLENAME FROM PG_ROLES; --PG_ROLES tablosundan rolename'leri okur.
+
+psql -U postgres -- -U user demek psql'e postgres isimli kullanıcı ile bağlandı.
+
+#> CREATE ROLE HUSEYIN; --HUSEYIN diye role oluşturur.
+\du --roller ve yetkileri.
+
+#> DROP ROLE IF EXISTS HUSEYIN; --HUSEYIN rolü varsa drop ederi.
+#> CREATE ROLE HUSEYIN WITH LOGIN PASSWORD 'HUSEYIN';
+#> CREATE USER HUSEYIN; --HUSEYIN kullanıcısı oluşturuldu aynı zamanda HUSEYIN diye role oluşturuldu.
+#> CREATE ROLE HUSEYIN SUPERUSER LOGIN PASSWORD 'HUSEYIN'; --SUPERUSER yetkisine sahip role oluşturuldu.
+#> psql -U HUSEYIN -d postgres; --postgres database'e HUSEYIN kullanıcısı ile girer.
+#> SELECT * FROM PEOPLES; --HUSEYIN kullanıcı için hata. Erişim reddedildi ver.r
+#> SELECT * FROM CUSTOMER; "" "" ""
+#> \c YETKILI_KISI --yetki verecek.
+#> GRANT SELECT ON PEOPLES TO HUSEYIN; --GRANT ile PEOPLES tablosu üzerinde HUSEYIN kullanıcısına yetki verildi.
+#> SELECT * FROM PEOPLES LIMIT 10; --Artık HUSEYIN kullanıcısının yetkisi var. PEOPLES tablosunun ilk 10 satırını okur.
+#> SELECT * FROM CUSTOMER; --hala yetkimiz yok. Erişim reddedildi. CUSTOMER tablosu için.
+#> GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA public TO HUSEYIN; --tüm yetkileri public şeması üzerindeki tüm tablolar üzerinde HUSEYIN kullanıcısına verir.
+#> SELECT * FROM CUSTOMER; --artık yetkimiz var.
+\dn --şema listesini verir.
+#> REVOKE ALL ON ALL TABLES IN SCHEMA PUBLIC FROM HUSEYIN; --HUSEYIN kullanıcısı için PUBLIC şemasında bulunan tüm tablolar üzerindeki yetkileri geri çeker.
+#> SELECT * FROM CUSTOMER; --artık yetkimiz yok. Erişim reddedildi.
+#> CREATE ROLE ENGINEERS; --ENGINEERS rolü yaratıldı.
+\du --ENGINEERS kullanıcısının yetkisi yok. rol attribute'lerini listeledik.
+#> DROP ROLE ENGINEERS;
+#> CREATE ROLE ENGINEERS LOGIN; --LOGIN yetkisi olan role oluşturuldu.
+#> GRANT ENGINEERS TO HUSEYIN; --ENGINEERS rolünü HUSEYIN kullanıcısına atar.
+#> \du
+#> REVOKE ENGINEERS FROM HUSEYIN; --HUSEYIN  kullanıcısından ENGINEERS rolü geri alındı.
+#> \du
+#> CREATE ROLE ALI INHERIT LOGIN PASSWORD 'ALI'; --ALI rolü create edilir. Sonradan bu role atanacak yetkileri otomatik kullanabilmesi için INHERIT ifadesi kullanıldı.
+INHERIT olmadan:
+
+Bir role başka roller atanabilir, ancak atanan rollerin yetkileri otomatik olarak kullanılmaz.
+Eğer bir role başka roller atanmışsa ve bu rol INHERIT özelliğine sahip değilse, kullanıcı atanan 
+rollerin yetkilerini kullanabilmek için her seferinde manuel olarak SET ROLE komutunu çalıştırmalıdır.
+Bu komutla yetkili rol aktif hale getirilir ve ancak o zaman o rolün yetkileri kullanılabilir.
+#> SET ROLE another_role;
+
+#> GRANT ENGINEERS TO ALI; --ALI rolünü ENGINEERS rolüne atadı.
+
+#> SELECT * FROM PUBLIC.PRODUCTS; --PUBLIC şeması içerisindeki products isimli tabloyu okur.
+#> SELECT CURRENT_SCHEMA(); --üzerinde o anda çalışılan şemayı verir.
+#> SELECT * FROM PRODUCTS;
+
+#> CREATE SCHEMA SALES; --satışlar isimli şema oluşturuldu.
+#> CREATE SCHEMA MARKETING; --marketing isimli şema oluşturuldu;
+#> \dn --şemalar listesini verir.
+#> \dt --ilişkili tablolar detayını verir.
+#> \dt SALES.* --satışlar şemasındaki tüm ilişkileri listeler.
+#> \dt MARKETING.* --MARKETING şemasındaki tüm ilişkileri listeler.
+#> CREATE TABLE PEOPLES(); --ERROR tablo zaten var.
+#> CREATE TABLE SALES.PEOPLES(); --SALES şemasında PEOPLES isimli tablo create eder.
+#> CREATE TABLE MARKETING.PEOPLES(); --MARKETING şemasında PEOPLES isimli tablo create eder.
+#> INSERT INTO MARKETING.PEOPLES() VALUES();
+
+#> SELECT * FROM PEOPLES LIMIT 1; --PEOPLES tablosundan 1. kaydı okur.
+#> SHOW SEARCH_PATH; --şemalar arası araması sırasını gösterir.
+PostgreSQL'de bir veritabanı içerisinde birden fazla şema olabilir.
+SEARCH_PATH şemaların içerisinde bir şey arayacağımız zaman arama sıralamasını yapar.
+Arama yapılırken öncelik sıralaması sağlar.
+PostgreSQL'de birden fazla veritabanı oluşturmak mümkündür.
+PostgreSQL, her biri bağımsız olan birden fazla veritabanını aynı sunucu üzerinde barındırabilir. 
+PostgreSQL, aynı sunucu üzerinde birden fazla veritabanı oluşturmanıza olanak tanır.
+Her veritabanı bağımsız olarak çalışır ve kendi kullanıcıları, şemaları, tabloları ve diğer nesneleri vardır.
+Veritabanları, farklı projeler veya uygulamalar için ayrı veri kümelerini saklamak amacıyla kullanılabilir.
+
+SET SEARCH_PATH TO MARKETING, PUBLIC; --MARKETING ve PUBLIC şemalarını arama yoluna sırası ile SET ediyor.
+
+#> \dn
+#> SELECT * FROM MARKETING.PEOPLE;
+#> GRANT USAGE ON SCHEMA MARKETING ON HUSEYIN; --MARKETING şeması üzerinde nesneleri kullanma yetkisini HUSEYIN kullanıcısına veriyor.
+#> GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA MARKETING TO HUSEYIN; --MARKETING şeması üzerinde tüm tablolar için tüm yetkiler HUSEYIN kullanıcısına verildi.
+#> pg_dump --help; 
+pg_dump: 
+PostgreSQL veritabanlarını yedeklemek için kullanılan bir komut satırı aracıdır.
+Bu araç, bir veritabanının yapısını ve içeriğini bir dosyaya yazar, böylece daha sonra bu yedeği kullanarak veritabanını geri yükleyebilirsiniz.
+
+#> pg_dump -U HUSEYIN -F p postgres > "C:\Users\Huseyin_Aydin\Documents\husocode-backup.sql" --yedek almak. sql uzantılı bir dosyaya veritabanını yedek alıyor.
+-- -F file demek. p ise sql dosyası şeklinde yedek alıyor.
+#> pg_dump -U HUSEYIN -F t postgres > husocode-backup.tar
+-- -t tar anlamına geliyor. Arşiv dosyası şeklinde yedek alınıyor.
+#> pg_dump -U HUSEYIN postgres > husocode-backup.tar
+\! pwd --bulunduğumuz klasör. print working directory.
+\! cd --windows için.
+
+#> CREATE DATABASE HUSOCODE_BACKUP; --HUSOCODE_BACKUP isimli database oluşturur.
+#> \l
+#> psql -U postgres HUSOCODE_BACKUP -f husocode-backup.sql -- dosyadan oluşan yeni database' geri yükler ve connect olur.
+#> \c husocode-backup; --husocode-backup isimli database' bağlanır.
+#> \l --database listesi.
+
+#> pg_restore -d husocode_backup husocode-backup.sql --ilgili database'e dosyadan geri yükleme yapar.
+#> pg_dumpall > backup-all.sql -- tüm veritabanlarını ve kullanıcıları (rolleri) yedeklemek için kullanılır.
+#> pg_dumpall --schema-only > backup-all.sql ----schema-only: Bu seçenek, yalnızca veritabanlarının şemalarını (veri içermeyen yapı bilgileri) yedekler. Yani, tabloların yapıları, dizinler, görünümler ve diğer yapılar alınır, ancak veri alınmaz.
+#> pg_dumpall --help --komut hakkında yardım.
